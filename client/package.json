@@ -1,0 +1,21 @@
+{
+    "name": "listening-ear-client",
+    "version": "1.0.0",
+    "description": "Dependency-free browser client for the self-hosted Listening Ear realtime server",
+    "main": "listening-ear.js",
+    "browser": "listening-ear.js",
+    "scripts": {
+        "test": "node --test"
+    },
+    "files": [
+        "listening-ear.js",
+        "README.md"
+    ],
+    "keywords": [
+        "websocket",
+        "realtime",
+        "presence",
+        "channels"
+    ],
+    "license": "MIT"
+}

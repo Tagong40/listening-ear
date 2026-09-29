@@ -1,0 +1,25 @@
+{
+    "name": "Listening Ear Server",
+    "description": "Self-hosted realtime WebSocket and event server",
+    "buildpacks": [
+        {
+            "url": "heroku/nodejs"
+        }
+    ],
+    "formation": {
+        "web": {
+            "quantity": 1,
+            "size": "basic"
+        }
+    },
+    "addons": [
+        {
+            "plan": "heroku-postgresql:essential-0"
+        }
+    ],
+    "env": {
+        "NODE_ENV": {
+            "value": "production"
+        }
+    }
+}

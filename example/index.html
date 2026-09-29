@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>listening-ear demo</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 640px;
+      margin: 40px auto;
+      padding: 0 16px;
+    }
+
+    #status {
+      padding: 4px 10px;
+      border-radius: 6px;
+      display: inline-block;
+      font-size: 13px;
+    }
+
+    #status.connected {
+      background: #d1f7d6;
+      color: #1a7431;
+    }
+
+    #status.connecting,
+    #status.disconnected {
+      background: #fde2e2;
+      color: #a33;
+    }
+
+    #members {
+      color: #555;
+      margin: 12px 0;
+      font-size: 14px;
+    }
+
+    #log {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      height: 260px;
+      overflow-y: auto;
+      padding: 10px;
+      margin-top: 12px;
+    }
+
+    #log div {
+      padding: 4px 0;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 14px;
+    }
+
+    form {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    input {
+      flex: 1;
+      padding: 8px;
+    }
+
+    button {
+      padding: 8px 16px;
+    }
+  </style>
+</head>
+
+<body>
+  <h2>listening-ear demo</h2>
+  <span id="status" class="connecting">connecting…</span>
+  <div id="members">Members: —</div>
+  <div id="log"></div>
+  <form id="form">
+    <input id="input" placeholder="Say something…" autocomplete="off" />
+    <button type="submit">Send</button>
+  </form>
+
+  <script src="../client/listening-ear.js"></script>
+  <script>
+    const client = new ListeningEar('app-key', {
+      wsHost: 'localhost',
+      wsPort: 6001,
+      authEndpoint: 'http://localhost:6002/listening-ear/auth',
+    });
+
+    const statusEl = document.getElementById('status');
+    const membersEl = document.getElementById('members');
+    const logEl = document.getElementById('log');
+
+    client.connection.bind('state_change', (state) => {
+      statusEl.textContent = state;
+      statusEl.className = state;
+    });
+
+    const channel = client.subscribe('presence-room-1');
+
+    function renderMembers() {
+      const names = [];
+      channel.members.each((m) => names.push(m.info?.name || m.id));
+      membersEl.textContent = `Members (${channel.members.count}): ${names.join(', ')}`;
+    }
+
+    channel.bind('pusher:subscription_succeeded', renderMembers);
+    channel.bind('pusher:member_added', renderMembers);
+    channel.bind('pusher:member_removed', renderMembers);
+
+    function renderMessage(data) {
+      const div = document.createElement('div');
+      div.textContent = `${data.from}: ${data.text}`;
+      logEl.appendChild(div);
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    // Backend-triggered events use this application event.
+    channel.bind('new-message', renderMessage);
+
+    // Client events are delivered to other subscribers, not echoed to the sender.
+    channel.bind('client-message', renderMessage);
+
+    document.getElementById('form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const input = document.getElementById('input');
+      if (!input.value) return;
+      const message = { from: 'me', text: input.value };
+      channel.trigger('client-message', message);
+      renderMessage(message);
+      input.value = '';
+    });
+  </script>
+</body>
+
+</html>
