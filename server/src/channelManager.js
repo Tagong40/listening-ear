@@ -4,7 +4,7 @@
  * channels: Map<channelName, Set<socket>>
  * presenceMembers: Map<channelName, Map<userId, { userInfo, socketIds: Set<string> }>>
  *
- * This is single-process only — fine for learning/small deployments.
+ * This is single-process only -fine for learning/small deployments.
  * To scale horizontally you'd back this with Redis pub/sub instead.
  */
 class ChannelManager {

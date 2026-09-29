@@ -1,6 +1,6 @@
 /**
  * Example of triggering an event FROM YOUR BACKEND to all clients subscribed
- * to a channel — e.g. after saving a new message to your database.
+ * to a channel -e.g. after saving a new message to your database.
  *
  * Run: node example/trigger-event.js
  */

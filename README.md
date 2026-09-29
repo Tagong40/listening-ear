@@ -20,13 +20,13 @@ extend or to learn how realtime channel systems work under the hood.
                                              presence state)                     presence subscriptions)
 ```
 
-- **`server/`** — the realtime server. WebSocket endpoint at `ws://host:port/app`,
+- **`server/`** -the realtime server. WebSocket endpoint at `ws://host:port/app`,
   plus an HTTP endpoint `POST /apps/:appId/events` your backend calls to push
   events out to subscribers (this is how you go from "user posted a comment"
   in your DB layer to "everyone viewing that page sees it instantly").
-- **`client/listening-ear.js`** — drop into any web page with a `<script>` tag.
+- **`client/listening-ear.js`** -drop into any web page with a `<script>` tag.
   No build step, no dependencies.
-- **`example/`** — a runnable demo: a presence-channel chat page, an example
+- **`example/`** -a runnable demo: a presence-channel chat page, an example
   auth backend, and an example server-side trigger script.
 
 For an application, install the client package from `client/` (or publish it
@@ -43,7 +43,7 @@ The wire protocol is modeled on Pusher's (`pusher:*` event names, same HMAC auth
 
 Only `private-`/`presence-` channels allow **client events** (`client-*`),
 which are relayed peer-to-peer through the server without hitting your
-backend — useful for things like "user is typing…" indicators.
+backend -useful for things like "user is typing…" indicators.
 
 ## Running it
 
@@ -64,7 +64,7 @@ node auth-backend.js
 # 3. Open example/index.html in a browser (e.g. `open example/index.html`
 #    or serve it with any static file server)
 
-# 4. Trigger an event from a separate "backend" process — you'll see it
+# 4. Trigger an event from a separate "backend" process -you'll see it
 #    show up live in the browser tab you opened:
 node trigger-event.js
 ```
@@ -151,7 +151,7 @@ For a larger production workload, choose a larger Heroku Postgres plan.
 
 1. Client wants to subscribe to `private-orders-42` or `presence-room-1`.
 2. Client SDK POSTs `{ socket_id, channel_name }` to your `authEndpoint`
-   (you implement this — see `example/auth-backend.js`).
+   (you implement this -see `example/auth-backend.js`).
 3. Your backend checks the current user is allowed on that channel, then
    signs `HMAC_SHA256(appSecret, "${socketId}:${channel}[:${channelData}]")`
    and returns `{ auth: "appKey:signature", channel_data? }`.
@@ -187,13 +187,13 @@ client.disconnect();
 
 ## What's simplified vs. managed realtime services
 
-- Single process, in-memory state — no horizontal scaling (would need
+- Single process, in-memory state -no horizontal scaling (would need
   Redis pub/sub or similar to share channel state across server instances).
 - No webhooks, no watchlist/user-authentication events, no channel
   existence/occupied events beyond presence.
 - REST auth is a workable HMAC scheme but not byte-for-byte identical to
   managed provider signature specifications.
-- No TLS termination built in — put this behind a reverse proxy (nginx,
+- No TLS termination built in -put this behind a reverse proxy (nginx,
   Caddy) with TLS in any real deployment, and set `forceTLS: true` /
   use `wss://` on the client.
 

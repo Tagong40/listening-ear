@@ -4,7 +4,7 @@
  * The client SDK POSTs { socket_id, channel_name } here whenever it needs
  * to subscribe to a private-* or presence-* channel. This endpoint decides
  * whether the current (logged-in) user is allowed to join that channel,
- * then signs the subscription using your app secret — which never reaches
+ * then signs the subscription using your app secret -which never reaches
  * the browser.
  *
  * Run alongside the main server:
