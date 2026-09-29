@@ -1,5 +1,5 @@
 /**
- * Listening Ear — a small, dependency-free realtime client SDK.
+ * Listening Ear -a small, dependency-free realtime client SDK.
  *
  * Usage:
  *   const client = new ListeningEar('app-key', {
