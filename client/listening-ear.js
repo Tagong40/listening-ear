@@ -158,6 +158,9 @@
       this.ws.onclose = () => {
         this._setState('disconnected');
         this.socketId = null;
+        // The server forgets subscriptions when the socket closes, so mark every
+        // channel unsubscribed; they're re-subscribed on the next connection_established.
+        for (const ch of this.channels.values()) ch.subscribed = false;
         if (!this._explicitlyDisconnected) this._scheduleReconnect();
       };
 
