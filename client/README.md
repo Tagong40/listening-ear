@@ -106,13 +106,13 @@ Presence channels track which users are subscribed.
 ```js
 const room = client.subscribe('presence-room-1');
 
-room.bind('pusher:subscription_succeeded', () => {
+room.bind('listening-ear:subscription_succeeded', () => {
   console.log(`${room.members.count} online`);
   room.members.each((member) => console.log(member.id, member.info));
 });
 
-room.bind('pusher:member_added', (member) => console.log('joined', member.id));
-room.bind('pusher:member_removed', (member) => console.log('left', member.id));
+room.bind('listening-ear:member_added', (member) => console.log('joined', member.id));
+room.bind('listening-ear:member_removed', (member) => console.log('left', member.id));
 ```
 
 `room.members` provides `count`, `get(userId)`, and `each(callback)`. A user with several tabs open counts once, and is only removed when their last tab closes.
@@ -155,12 +155,10 @@ room.bind('client-typing', ({ user }) => showTyping(user));
 
 | Event | Payload |
 |---|---|
-| `pusher:subscription_succeeded` | Presence channels: `{ presence: { ids, hash, count } }` |
-| `pusher:subscription_error` | `{ message }`, e.g. when the auth endpoint rejects the user |
-| `pusher:member_added` | `{ id, info }` |
-| `pusher:member_removed` | `{ id, info }` |
-
-The `pusher:` prefix is part of the wire protocol, which is modeled on Pusher's.
+| `listening-ear:subscription_succeeded` | Presence channels: `{ presence: { ids, hash, count } }` |
+| `listening-ear:subscription_error` | `{ message }`, e.g. when the auth endpoint rejects the user |
+| `listening-ear:member_added` | `{ id, info }` |
+| `listening-ear:member_removed` | `{ id, info }` |
 
 ## Reconnecting
 
@@ -174,8 +172,9 @@ client.connection.bind('state_change', (state) => {
 
 ## Upgrading from 1.x
 
-- The file is now `listening-ear.js` (it was `pusher-like.js`). `require('listening-ear-client')` and `import` work unchanged. Update any direct file paths or CDN URLs.
-- The `Pusher` and `PusherLike` global aliases were removed. Use `ListeningEar`.
+- The browser file was renamed to `listening-ear.js`. `require('listening-ear-client')` and `import` work unchanged. Update any direct file paths or CDN URLs.
+- The old global aliases were removed. Use `ListeningEar`.
+- Channel event names now use the `listening-ear:` prefix, e.g. `listening-ear:subscription_succeeded`. This client needs a server running the same version.
 - Fixed: channels are now re-subscribed after a reconnect.
 
 ## License

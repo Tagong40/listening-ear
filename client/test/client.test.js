@@ -41,8 +41,8 @@ test('re-subscribes to channels after the connection drops and reconnects', asyn
     const client = new ListeningEar('app-key');
     const channel = client.subscribe('products');
 
-    sockets[0].receive({ event: 'pusher:connection_established', data: { socket_id: 's1' } });
-    sockets[0].receive({ event: 'pusher:subscription_succeeded', channel: 'products', data: {} });
+    sockets[0].receive({ event: 'listening-ear:connection_established', data: { socket_id: 's1' } });
+    sockets[0].receive({ event: 'listening-ear:subscription_succeeded', channel: 'products', data: {} });
     assert.equal(channel.subscribed, true);
 
     sockets[0].onclose(); // connection drops
@@ -50,8 +50,8 @@ test('re-subscribes to channels after the connection drops and reconnects', asyn
     t.mock.timers.tick(10_000); // reconnect backoff
 
     assert.equal(sockets.length, 2);
-    sockets[1].receive({ event: 'pusher:connection_established', data: { socket_id: 's2' } });
-    assert.deepEqual(sockets[1].sent, [{ event: 'pusher:subscribe', data: { channel: 'products' } }]);
+    sockets[1].receive({ event: 'listening-ear:connection_established', data: { socket_id: 's2' } });
+    assert.deepEqual(sockets[1].sent, [{ event: 'listening-ear:subscribe', data: { channel: 'products' } }]);
 
     client.disconnect();
 });

@@ -131,7 +131,7 @@ function broadcastToChannel(channel, message, excludeSocketId) {
 }
 
 function errorTo(socket, code, msg) {
-  send(socket, { event: 'pusher:error', data: { code, message: msg } });
+  send(socket, { event: 'listening-ear:error', data: { code, message: msg } });
 }
 
 // ---- Connection lifecycle --------------------------------------------------
@@ -152,7 +152,7 @@ async function initializeSocket(socket, request) {
   await recordUsage(pool, socket.app.id, { connections_total: 1, active_connections: 1 });
 
   send(socket, {
-    event: 'pusher:connection_established',
+    event: 'listening-ear:connection_established',
     data: { socket_id: socket.id, activity_timeout: ACTIVITY_TIMEOUT_MS / 1000 },
   });
 
@@ -178,7 +178,7 @@ async function initializeSocket(socket, request) {
     const leftPresence = channelManager.removeSocketEverywhere(socket);
     for (const { channel, userId } of leftPresence) {
       broadcastToChannel(channel, {
-        event: 'pusher_internal:member_removed',
+        event: 'listening-ear_internal:member_removed',
         channel,
         data: { user_id: userId },
       });
@@ -197,12 +197,12 @@ function handleMessage(socket, msg) {
   const { event, data = {}, channel } = msg;
 
   switch (event) {
-    case 'pusher:subscribe':
+    case 'listening-ear:subscribe':
       return handleSubscribe(socket, data);
-    case 'pusher:unsubscribe':
+    case 'listening-ear:unsubscribe':
       return handleUnsubscribe(socket, data);
-    case 'pusher:ping':
-      return send(socket, { event: 'pusher:pong', data: {} });
+    case 'listening-ear:ping':
+      return send(socket, { event: 'listening-ear:pong', data: {} });
     default:
       if (event && event.startsWith('client-')) {
         return handleClientEvent(socket, channel, event, data);
@@ -228,7 +228,7 @@ function handleSubscribe(socket, data) {
     });
     if (!ok) {
       return send(socket, {
-        event: 'pusher:subscription_error',
+        event: 'listening-ear:subscription_error',
         channel,
         data: { message: 'Auth signature invalid' },
       });
@@ -243,7 +243,7 @@ function handleSubscribe(socket, data) {
       userInfo = JSON.parse(channel_data);
     } catch {
       return send(socket, {
-        event: 'pusher:subscription_error',
+        event: 'listening-ear:subscription_error',
         channel,
         data: { message: 'Invalid channel_data for presence channel' },
       });
@@ -253,20 +253,20 @@ function handleSubscribe(socket, data) {
 
     const { hash } = channelManager.presenceMemberList(channel);
     send(socket, {
-      event: 'pusher:subscription_succeeded',
+      event: 'listening-ear:subscription_succeeded',
       channel,
       data: { presence: { ids: Object.keys(hash), hash, count: Object.keys(hash).length } },
     });
 
     if (isNew) {
       broadcastToChannel(channel, {
-        event: 'pusher_internal:member_added',
+        event: 'listening-ear_internal:member_added',
         channel,
         data: { user_id: userId, user_info: info },
       }, socket.id);
     }
   } else {
-    send(socket, { event: 'pusher:subscription_succeeded', channel, data: {} });
+    send(socket, { event: 'listening-ear:subscription_succeeded', channel, data: {} });
   }
 }
 
@@ -278,7 +278,7 @@ function handleUnsubscribe(socket, data) {
     const left = channelManager.leavePresence(channel, socket);
     if (left) {
       broadcastToChannel(channel, {
-        event: 'pusher_internal:member_removed',
+        event: 'listening-ear_internal:member_removed',
         channel,
         data: { user_id: left.userId },
       });

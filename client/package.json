@@ -1,6 +1,6 @@
 {
     "name": "listening-ear-client",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "description": "Dependency-free browser client for the self-hosted Listening Ear realtime server",
     "main": "listening-ear.js",
     "browser": "listening-ear.js",

@@ -12,7 +12,7 @@
  *   channel.bind('new-message', (data) => console.log(data));
  *   channel.trigger('client-typing', { user: 'ada' }); // client event
  *
- *   channel.bind('pusher:subscription_succeeded', () => {
+ *   channel.bind('listening-ear:subscription_succeeded', () => {
  *     console.log(channel.members.each((m) => console.log(m)));
  *   });
  */
@@ -201,7 +201,7 @@
       }
       const { event, channel, data } = msg;
 
-      if (event === 'pusher:connection_established') {
+      if (event === 'listening-ear:connection_established') {
         this.socketId = data.socket_id;
         this._setState('connected');
         // Re-subscribe to any channels the app had subscribed to before a reconnect.
@@ -211,35 +211,35 @@
         return;
       }
 
-      if (event === 'pusher:pong') return; // heartbeat ack, nothing to do
+      if (event === 'listening-ear:pong') return; // heartbeat ack, nothing to do
 
       if (!channel) return;
       const ch = this.channels.get(channel);
       if (!ch) return;
 
       switch (event) {
-        case 'pusher:subscription_succeeded':
+        case 'listening-ear:subscription_succeeded':
           ch.subscribed = true;
           if (ch.members && data.presence) {
             ch.members._reset(data.presence.hash);
             ch.members.myID = this.socketId;
           }
-          ch._emit('pusher:subscription_succeeded', data);
+          ch._emit('listening-ear:subscription_succeeded', data);
           break;
-        case 'pusher:subscription_error':
-          ch._emit('pusher:subscription_error', data);
+        case 'listening-ear:subscription_error':
+          ch._emit('listening-ear:subscription_error', data);
           break;
-        case 'pusher_internal:member_added':
+        case 'listening-ear_internal:member_added':
           if (ch.members) {
             ch.members._add(data.user_id, data.user_info);
-            ch._emit('pusher:member_added', { id: data.user_id, info: data.user_info });
+            ch._emit('listening-ear:member_added', { id: data.user_id, info: data.user_info });
           }
           break;
-        case 'pusher_internal:member_removed':
+        case 'listening-ear_internal:member_removed':
           if (ch.members) {
             const info = ch.members.get(data.user_id)?.info;
             ch.members._remove(data.user_id);
-            ch._emit('pusher:member_removed', { id: data.user_id, info });
+            ch._emit('listening-ear:member_removed', { id: data.user_id, info });
           }
           break;
         default:
@@ -261,7 +261,7 @@
     unsubscribe(channelName) {
       const channel = this.channels.get(channelName);
       if (!channel) return;
-      this._send({ event: 'pusher:unsubscribe', data: { channel: channelName } });
+      this._send({ event: 'listening-ear:unsubscribe', data: { channel: channelName } });
       this.channels.delete(channelName);
     }
 
@@ -274,7 +274,7 @@
       const needsAuth = name.startsWith('private-') || name.startsWith('presence-');
 
       if (!needsAuth) {
-        return this._send({ event: 'pusher:subscribe', data: { channel: name } });
+        return this._send({ event: 'listening-ear:subscribe', data: { channel: name } });
       }
 
       try {
@@ -285,10 +285,10 @@
         });
         if (!res.ok) throw new Error(`Auth endpoint responded ${res.status}`);
         const { auth, channel_data } = await res.json();
-        this._send({ event: 'pusher:subscribe', data: { channel: name, auth, channel_data } });
+        this._send({ event: 'listening-ear:subscribe', data: { channel: name, auth, channel_data } });
       } catch (err) {
         console.error(`[ListeningEar] Failed to authenticate channel "${name}":`, err);
-        channel._emit('pusher:subscription_error', { message: err.message });
+        channel._emit('listening-ear:subscription_error', { message: err.message });
       }
     }
   }

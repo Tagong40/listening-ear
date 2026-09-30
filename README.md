@@ -31,7 +31,7 @@ extend or to learn how realtime channel systems work under the hood.
 
 For an application, install the client package from `client/` (or publish it
 to your private npm registry) and use `new ListeningEar(appKey, options)`.
-The wire protocol is modeled on Pusher's (`pusher:*` event names, same HMAC auth scheme), which makes it a useful reference for how hosted realtime services work.
+Protocol messages use `listening-ear:*` event names, and REST and channel requests are signed with HMAC-SHA256.
 
 ## Channel types
 
@@ -177,7 +177,7 @@ const client = new ListeningEar('app-key', {
 
 const channel = client.subscribe('presence-room-1');
 channel.bind('new-message', (data) => { /* ... */ });
-channel.bind('pusher:member_added', ({ id, info }) => { /* ... */ });
+channel.bind('listening-ear:member_added', ({ id, info }) => { /* ... */ });
 channel.trigger('client-typing', { user: 'ada' }); // client event
 
 client.connection.bind('state_change', (state) => console.log(state));

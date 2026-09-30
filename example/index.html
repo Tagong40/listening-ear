@@ -103,9 +103,9 @@
       membersEl.textContent = `Members (${channel.members.count}): ${names.join(', ')}`;
     }
 
-    channel.bind('pusher:subscription_succeeded', renderMembers);
-    channel.bind('pusher:member_added', renderMembers);
-    channel.bind('pusher:member_removed', renderMembers);
+    channel.bind('listening-ear:subscription_succeeded', renderMembers);
+    channel.bind('listening-ear:member_added', renderMembers);
+    channel.bind('listening-ear:member_removed', renderMembers);
 
     function renderMessage(data) {
       const div = document.createElement('div');

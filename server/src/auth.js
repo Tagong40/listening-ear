@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 
 /**
- * HMAC-SHA256 signing, the same scheme Pusher uses:
+ * HMAC-SHA256 signing:
  *   signature = hex( HMAC_SHA256( appSecret, stringToSign ) )
  */
 function sign(secret, stringToSign) {
@@ -53,7 +53,7 @@ const MAX_TIMESTAMP_SKEW_SECONDS = 600;
 
 /**
  * Verifies REST API requests (POST /apps/:appId/events) using a simplified
- * version of Pusher's REST auth scheme: HMAC over method+path+sorted-query+body.
+ * version of a common REST auth scheme: HMAC over method+path+sorted-query+body.
  *
  * Requests whose auth_timestamp is more than 10 minutes from the server clock
  * are rejected, so a captured signed request can't be replayed indefinitely.
